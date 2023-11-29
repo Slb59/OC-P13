@@ -1,4 +1,5 @@
 import os
+import sentry_sdk
 
 from pathlib import Path
 
@@ -14,8 +15,7 @@ SECRET_KEY = 'fp$9^593hsriajg$_%=5trot9g!1qa@ew(o-1#@=&4%=hp46(s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost',  '127.0.0.1']
 
 
 # Application definition
@@ -119,3 +119,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static", ]
+
+dsn = "https://386bd82c309c6697a1d829a225374fae@o4505946318635008"
+dsn += ".ingest.sentry.io/4506098369822720"
+
+sentry_sdk.init(
+    dsn=dsn,
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production,
+    traces_sample_rate=1.0,
+)
