@@ -1,3 +1,5 @@
+image: docker:20.10.16
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
@@ -5,6 +7,16 @@ stages:          # List of stages for jobs, and their order of execution
   - package
   - deploy
   - cleanup
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+
+services:
+  - name: docker:20.10.16-dind
+    alias: docker
+    command: ["--tls=false"]
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
@@ -25,7 +37,7 @@ test-job:
 
 flake-job:
   stage: quality
-  image: registry.gitlab.com/mafda/python-linting
+  image: docker.io/slb59/django-linting
   only:
     - merge_requests
   script:
