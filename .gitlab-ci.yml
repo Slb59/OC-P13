@@ -64,6 +64,10 @@ package-job:
   stage: package
   only:
     - main
+  script:
+    - echo "package job working..."
+    - sleep 10
+    - echo "package job completed"
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
