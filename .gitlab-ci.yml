@@ -1,31 +1,88 @@
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - quality
+  - package
   - deploy
+  - cleanup
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
+  except:
+    - pushes
   script:
     - echo "Compiling the code..."
     - echo "Compile complete."
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+test-job:
+  stage: test
+  only:
+    - merge_requests
   script:
     - echo "Running unit tests... This will take about 60 seconds."
     - sleep 60
-    - echo "Code coverage is 90%"
+    - echo "Code coverage is ??%"
 
-lint-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+flake-job:
+  stage: quality
+  image: registry.gitlab.com/mafda/python-linting
+  only:
+    - merge_requests
   script:
-    - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
+    - echo "Linting code..."
+    - flake8
     - echo "No lint issues found."
+
+isort-job:
+  stage: quality
+  only:
+    - merge_requests
+  script:
+    - echo "isort import code..."
+    - sleep 10
+    - echo "see isort report"
+
+black-job:
+  stage: quality
+  only:
+    - merge_requests
+  script:
+    - echo "black checking..."
+    - sleep 10
+    - echo "see black report"
+
+pylint-job:
+  stage: quality
+  only:
+    - merge_requests
+  script:
+    - echo "pylint checking..."
+    - sleep 10
+    - echo "see pylint report"
+
+package-job:
+  stage: package
+  only:
+    - main
+  script:
+    - echo "package job working..."
+    - sleep 10
+    - echo "package job completed"
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
+  only:
+    - master
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+
+cleanup-job:
+  stage: cleanup
+  only:
+    - main
+  script:
+    - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
+    - sleep 10
+    - echo "cleanup completed"
