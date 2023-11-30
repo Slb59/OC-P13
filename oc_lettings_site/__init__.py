@@ -1,5 +1,7 @@
 """oc_lettings_site init module
 init the env environ"""
+__version__ = "1.0.0"
+
 import pathlib
 
 import environ
