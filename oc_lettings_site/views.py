@@ -1,6 +1,6 @@
 import logging
-from django.shortcuts import render
 
+from django.shortcuts import render
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +31,8 @@ def server_error(request, exception=None):
     response = render(request, "base/500.html", {})
     response.status_code = 500
     return response
+
+
+def trigger_error(request):
+    division_by_zero = 1 / 0
+    return division_by_zero

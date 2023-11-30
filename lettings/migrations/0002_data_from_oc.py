@@ -1,6 +1,8 @@
-import os
+"""insert data from oc_lettings_site"""
 from django.db import migrations
+
 from tools.tools import read_sql
+
 
 class Migration(migrations.Migration):
 

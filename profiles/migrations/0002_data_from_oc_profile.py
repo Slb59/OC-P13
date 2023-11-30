@@ -1,4 +1,6 @@
+"""insert data from oc-lettings-site"""
 from django.db import migrations
+
 from tools.tools import read_sql
 
 

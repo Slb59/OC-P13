@@ -1,7 +1,9 @@
+"""test letting views"""
 from django.test import TestCase
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
-from lettings.models import Letting, Address
+
+from lettings.models import Address, Letting
 
 
 class LettingsViewsTestCase(TestCase):

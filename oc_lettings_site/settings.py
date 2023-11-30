@@ -22,11 +22,12 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG_VALUE") == "True"
+print(DEBUG)
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+    ALLOWED_HOSTS = env.list("HOSTS", default=[])
 
 # Application definition
 
@@ -52,7 +53,7 @@ if DEBUG:
 else:
     TIERS_APPS = []
 
-INSTALLED_APPS = LETTING_APPS + DJANGO_APPS + TIERS_APPS
+INSTALLED_APPS = TIERS_APPS + LETTING_APPS + DJANGO_APPS
 
 STANDARD_MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

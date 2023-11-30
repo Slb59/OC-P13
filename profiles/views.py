@@ -1,8 +1,10 @@
+"""views definitions for profiles"""
 import logging
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from .models import Profile
 
+from django.core.cache import cache
+from django.shortcuts import get_object_or_404, render
+
+from .models import Profile
 
 logger = logging.getLogger(__name__)
 
@@ -20,14 +22,18 @@ def index(request):
         _type_: _description_
     """
     logger.debug("profiles-DEBUG")
-    logger.info("profiles-INFO")
+    logger.info("profiles-INFO")black . --check
     logger.warning("profiles-WARNING")
     logger.error("profiles-ERROR")
     logger.critical("profiles-CRITICAL")
     # ---------------------------------------
-    profiles_list = Profile.objects.all()
-    context = {'profiles_list': profiles_list}
-    return render(request, 'profiles/index.html', context)
+    profiles_list = cache.get("all_profiles")
+    if not profiles_list:
+        profiles_list = Profile.objects.all()
+        cache.set("all_profiles", profiles_list)
+
+    context = {"profiles_list": profiles_list}
+    return render(request, "profiles/index.html", context)
 
 
 # Aliquam sed metus eget nisi tincidunt ornare accumsan eget lac
