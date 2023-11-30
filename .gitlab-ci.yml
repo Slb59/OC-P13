@@ -8,20 +8,24 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
+  except:
+    - pushes
   script:
     - echo "Compiling the code..."
     - echo "Compile complete."
 
-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+test-job:
+  stage: test
+  only:
+    - merge_requests
   script:
     - echo "Running unit tests... This will take about 60 seconds."
     - sleep 60
-    - echo "Code coverage is 90%"
+    - echo "Code coverage is ??%"
 
 flake-job:
   stage: quality
-  image: python:latest
+  image: registry.gitlab.com/mafda/python-linting
   only:
     - merge_requests
   script:
@@ -56,15 +60,24 @@ pylint-job:
     - sleep 10
     - echo "see pylint report"
 
+package-job:
+  stage: package
+  only:
+    - main
+
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
+  only:
+    - master
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
 
 cleanup-job:
   stage: cleanup
+  only:
+    - main
   script:
     - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
     - sleep 10
