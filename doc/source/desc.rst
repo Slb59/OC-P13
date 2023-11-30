@@ -2,6 +2,10 @@
 Application Description
 =======================
 
+
+Home page
+---------
+
 When you run the application locally with command python manage.py runserver, you go to http://localhost:8000 to access home page.
 
 
@@ -9,6 +13,9 @@ When you run the application locally with command python manage.py runserver, yo
    :alt: home page
 
 -----
+
+Lettings application
+--------------------
 
 then you can access the lettings list:
 
@@ -24,12 +31,16 @@ and select one to show the address:
 
 -----
 
+Profiles application
+--------------------
+
 then you can go back home and inspect the profiles list:
 
 .. image:: images/profileslist.png
    :alt: home page
 
 -----
+
 
 and look at a profile data:
 
