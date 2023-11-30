@@ -35,6 +35,7 @@ It also allows for performance monitoring.
 Run the site
 ------------
 
+ - mkdir logs
  - python manage.py runserver
  - goto http://localhost:8000 with your browser
  - confirm that the site is working and that it is possible to navigate through the different pages

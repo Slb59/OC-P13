@@ -53,9 +53,9 @@ def letting(request, letting_id):
     Returns:
         _type_: _description_
     """
-    letting = get_object_or_404(Letting, id=letting_id)
+    letting_info = get_object_or_404(Letting, id=letting_id)
     context = {
-        "title": letting.title,
-        "address": letting.address,
+        "title": letting_info.title,
+        "address": letting_info.address,
     }
     return render(request, "lettings/letting.html", context)

@@ -1,23 +1,24 @@
 """test letting views"""
+import pytest
+
 from django.test import TestCase
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
-from lettings.models import Address, Letting
+from lettings.models import Letting
 
 
 class LettingsViewsTestCase(TestCase):
+    @pytest.fixture(autouse=True)
+    def prepare_fixture(self, myaddress):
+        self.myaddress = myaddress
+
     def setUp(self):
-        self.address = Address.objects.create(
-            number=100,
-            street="My street",
-            city="My city",
-            state="My state",
-            zip_code=10000,
-            country_iso_code="USA",
-        )
+        """setup an instance of address"""
+        self.address = self.myaddress
 
     def test_letting_index_view(self):
+        """test index view"""
         Letting.objects.create(title="My letting", address=self.address)
         path = reverse("lettings:index")
         response = self.client.get(path)
@@ -28,6 +29,7 @@ class LettingsViewsTestCase(TestCase):
         assertTemplateUsed(response, "lettings/index.html")
 
     def test_letting_view(self):
+        """test letting view"""
         letting = Letting.objects.create(title="My letting", address=self.address)
         path = reverse("lettings:letting", args=[1])
         response = self.client.get(path)
@@ -37,6 +39,7 @@ class LettingsViewsTestCase(TestCase):
         assertTemplateUsed(response, "lettings/letting.html")
 
     def test_letting_404_view(self):
+        """test page 404"""
         path = reverse("lettings:letting", args=[0])
         response = self.client.get(path)
         expected_content = "<h1>Page not found</h1>"
@@ -44,6 +47,7 @@ class LettingsViewsTestCase(TestCase):
         assertTemplateUsed(response, "base/404.html")
 
     def test_letting_noletting_view(self):
+        """test no letting view"""
         path = reverse("lettings:index")
         response = self.client.get(path)
         expected_content = "<p>No lettings are available.</p>"

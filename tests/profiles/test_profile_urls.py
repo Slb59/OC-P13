@@ -8,9 +8,11 @@ from profiles.models import Profile
 
 class ProfilesUrlsTestCase(TestCase):
     def setUp(self):
+        """setup a new user"""
         self.user = User.objects.create(username="test_user_name")
 
     def test_profile_index_url(self):
+        """test profile index url"""
         Profile.objects.create(user=self.user, favorite_city="My favorite city")
         path = reverse("profiles:index")
 
@@ -18,6 +20,7 @@ class ProfilesUrlsTestCase(TestCase):
         assert resolve(path).view_name == "profiles:index"
 
     def test_profile_url(self):
+        """test a profile url"""
         profile = Profile.objects.create(
             user=self.user, favorite_city="My favorite city"
         )

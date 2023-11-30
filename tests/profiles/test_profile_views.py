@@ -10,9 +10,11 @@ from profiles.models import Profile
 
 class ProfilesViewsTestCase(TestCase):
     def setUp(self):
+        """setup a new user"""
         self.user = User.objects.create(username="test_user_name")
 
     def test_profile_index_view(self):
+        """test profile index view"""
         Profile.objects.create(user=self.user, favorite_city="My favorite city")
         path = reverse("profiles:index")
         response = self.client.get(path)
@@ -23,6 +25,7 @@ class ProfilesViewsTestCase(TestCase):
         assertTemplateUsed(response, "profiles/index.html")
 
     def test_profile_view(self):
+        """test profile view"""
         profile = Profile.objects.create(
             user=self.user, favorite_city="My favorite city"
         )
@@ -34,6 +37,7 @@ class ProfilesViewsTestCase(TestCase):
         assertTemplateUsed(response, "profiles/profile.html")
 
     def test_profile_404_view(self):
+        """test 404 view"""
         path = reverse("profiles:profile", args=["inconnu"])
         response = self.client.get(path)
         expected_content = "<h1>Page not found</h1>"
@@ -41,6 +45,7 @@ class ProfilesViewsTestCase(TestCase):
         assertTemplateUsed(response, "base/404.html")
 
     def test_profile_noprofile_view(self):
+        """test no profile found"""
         cache.clear()
         path = reverse("profiles:index")
         response = self.client.get(path)

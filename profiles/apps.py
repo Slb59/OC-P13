@@ -1,3 +1,4 @@
+"""profiles app definition"""
 from django.apps import AppConfig
 
 
