@@ -1,5 +1,5 @@
 ==================================
-Development and deployment Process
+Development Process
 ==================================
 
 Run the site locally with Django
@@ -10,7 +10,7 @@ Run the site locally with Django
  - python manage.py runserver
  - goto http://localhost:8000 with your browser
  - goto http://localhost:8000/admin to access the admin panel
- you can connect with user admin and mot de passe Abc1234!
+      you can connect with user admin and mot de passe Abc1234!
  - goto http://localhost:8000/sentry-debug/ to generate a ZeroDivisionError and verify your Sentry account
 
 
@@ -44,16 +44,22 @@ Linting
        
        flake8
 
+isort
+^^^^^
 - isort is a Python utility / library to sort imports alphabetically, and automatically separated into sections and by type
     .. code-block:: shell
        
        isort . --check
 
+black
+^^^^^
 - black is the uncompromising Python code formatter.
     .. code-block:: shell
     
        black . --check
 
+pylint
+^^^^^^
 - pylint is a static code analyser for Python 2 or 3.
     .. code-block:: shell
         
@@ -61,19 +67,21 @@ Linting
     
     then you can check the logs/pylint.txt file
 
+pytest
+^^^^^^
 - pytest framework makes it easy to write unit tests
     .. code-block:: shell
         
        pytest
 
-    You can check the tests coverage with:
+   You can check the tests coverage with:
     .. code-block:: shell
     
        pytest --cov=. --cov-report=html
 
-    then check the result in htmlcov.index.html
+   then check the result in htmlcov.index.html
 
-    You can also check the html report logs/pytest-report.html with:
+   You can also check the html report logs/pytest-report.html with:
     .. code-block:: shell
     
        pytest --html=logs/pytest-report.html
