@@ -8,7 +8,6 @@ services:
     image: slb59/lettings
     container_name: lettings
     depends_on:
-      - database
       - memcached
       - redis
     env_file:
@@ -17,14 +16,6 @@ services:
       - 8000:8000
     command: /start
 
-  database:
-    image: keinos/sqlite3:latest
-    container_name: sqlite_base
-    env_file:
-      - ../.env
-    volumes:
-      - lettings_data:/data
-  
   memcached:
     image: memcached:latest
     container_name: memcached
@@ -32,7 +23,3 @@ services:
   redis:
     image: redis:latest
     container_name: redis
-
-
-volumes:
-  lettings_data: {}

@@ -5,15 +5,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /app
 
+COPY ./compose/requirements.txt .
+
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    build-essential
-
-COPY ./Pipfile.lock .
-COPY ./Pipfile .
-
-RUN pip install pipenv --upgrade
-
-RUN set -ex && pipenv install
+    build-essential && pip install -r requirements.txt
 
 COPY . .
 

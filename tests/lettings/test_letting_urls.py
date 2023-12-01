@@ -1,6 +1,5 @@
 """test letting urls"""
 import pytest
-
 from django.test import TestCase
 from django.urls import resolve, reverse
 
