@@ -1,10 +1,11 @@
 image: docker:20.10.16
 
-stages:          # List of stages for jobs, and their order of execution
+stages:
+  - quality # merge_requests
   - build
   - test
-  - quality
-  - package
+  - linting
+  - package # main
   - deploy
   - cleanup
 
@@ -25,7 +26,17 @@ build-job:       # This job runs in the build stage, which runs first.
     - merge_requests
   script:
     - echo "Compiling the code..."
-    - echo "some text into file" > build.html
+    - docker info
+    - docker-compose --version
+    - echo "DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY" >> .env
+    - echo "DEBUG_VALUE=$DEBUG_VALUE" >> .env
+    - echo "HOSTS=$HOSTS" >> .env
+    - echo "DATABASE_NAME=$DATABASE_NAME" >> .env
+    - echo "DSN_SENTRY=$DSN_SENTRY" >> .env
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - mkdir -p public/build
+    - docker compose -f compose/docker-compose.yml build
+    - docker images slb59/lettings > public/build/build.html
     - echo "Compile complete."
   artifacts:
     paths:
@@ -33,7 +44,7 @@ build-job:       # This job runs in the build stage, which runs first.
 
 test-job:
   stage: test
-  image: docker.io/slb59/django-pytest
+  image: slb59/lettings
   only:
     - merge_requests
   script:
@@ -72,8 +83,8 @@ black-job:
     - echo "see black report"
 
 pylint-job:
-  stage: quality
-  image: docker.io/slb59/django-linting
+  stage: linting
+  image: slb59/lettings
   only:
     - merge_requests
   script:
