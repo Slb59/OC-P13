@@ -20,11 +20,16 @@ services:
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
+  image: alpine
   except:
     - pushes
   script:
     - echo "Compiling the code..."
+    - echo "some text into file" > build.html
     - echo "Compile complete."
+  artifacts:
+    paths:
+      - build.html
 
 test-job:
   stage: test
@@ -47,30 +52,49 @@ flake-job:
 
 isort-job:
   stage: quality
+  image: docker.io/slb59/django-linting
   only:
     - merge_requests
   script:
     - echo "isort import code..."
-    - sleep 10
+    - isort . --check
     - echo "see isort report"
 
 black-job:
   stage: quality
+  image: docker.io/slb59/django-linting
   only:
     - merge_requests
   script:
     - echo "black checking..."
-    - sleep 10
+    - black . --check
     - echo "see black report"
 
 pylint-job:
   stage: quality
+  image: docker.io/slb59/django-linting
   only:
     - merge_requests
   script:
     - echo "pylint checking..."
-    - sleep 10
-    - echo "see pylint report"
+    - mkdir -p public/badges public/lint
+    - echo undefined > public/badges/$CI_JOB_NAME.score
+    - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
+    - sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' /tmp/pylint.txt > public/badges/$CI_JOB_NAME.score
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabCodeClimateReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > codeclimate.json
+    - pylint --exit-zero --load-plugins=pylint_gitlab --output-format=gitlab-codeclimate $(find -type f -name "*.py" ! -path "**/.venv/**") > codeclimate.json
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabPagesHtmlReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > public/lint/index.html
+    - echo "pylint process completed, check the report"
+  after_script:
+    - anybadge --overwrite --label $CI_JOB_NAME --value=$(cat public/badges/$CI_JOB_NAME.score) --file=public/badges/$CI_JOB_NAME.svg 4=red 6=orange 8=yellow 10=green
+    - |
+      echo "Your score is: $(cat public/badges/$CI_JOB_NAME.score)"
+  artifacts:
+    paths:
+      - public
+    reports:
+      codequality: codeclimate.json
+    when: always
 
 package-job:
   stage: package
