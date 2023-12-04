@@ -22,7 +22,7 @@ services:
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   image: alpine
-  except:
+  only:
     - merge_requests
   script:
     - echo "Compiling the code..."
