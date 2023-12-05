@@ -47,16 +47,15 @@ pytest-job:
     - pip install -r requirements.txt
     - pytest
     - pytest --cov=. --cov-report=html
-    - pytest --html=pytest-report.html
+    - pytest --html=htmlreport/pytest-report.html
     - coverage run -m pytest
     - coverage json
     - coverage report -m
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-  # coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:
       - coverage.json
-      - pytest-report.html
+      - htmlreport
       - htmlcov
 
 min-coverage-test:
@@ -71,7 +70,7 @@ min-coverage-test:
     - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
     - coverage="$(echo $jsonStr | jq .totals.percent_covered)"
     - echo "$coverage"
-    - if (( $(echo "$coverage < $MIN_COVERAGE" |bc -l) )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
+    - if (( $(echo "$coverage < $MIN_COVERAGE") )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
   
 
 flake-job:
