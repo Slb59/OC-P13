@@ -64,7 +64,7 @@ min-coverage-test:
     - merge_requests
   image: python:latest  
   before_script:
-    - apt-get update && apt-get install jq -y
+    - apt-get update && apt-get install jq -y && apt install bc
   script:
     - echo "$MIN_COVERAGE"
     - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
