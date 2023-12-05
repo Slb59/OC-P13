@@ -41,7 +41,8 @@ test-job:
     - merge_requests
   script:
     - echo "Running tests..."
-    - mkdir -p /app/logs
+    - echo $CI_CONFIG_PATH
+    - mkdir -p /builds/slb591/lettings/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - pytest
