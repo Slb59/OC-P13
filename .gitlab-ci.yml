@@ -38,13 +38,21 @@ build-job:       # This job runs in the build stage, which runs first.
 
 test-job:
   stage: test
+  image: python:latest
   only:
     - merge_requests
   script:
     - echo "Running tests..."
     - cp $ENV_FILE .env
-    - docker compose -f compose/docker-compose.yml run django pytest
-    - echo "Code coverage is ??%"
+    - pip install -r requirements.txt
+    - pytest
+    - pytest --cov=. --cov-report=html
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 flake-job:
   stage: quality
