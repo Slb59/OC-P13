@@ -21,7 +21,6 @@ services:
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
-  image: alpine
   only:
     - merge_requests
   script:
