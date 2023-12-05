@@ -45,7 +45,10 @@ test-job:
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - pytest
-    - pytest --cov=. --cov-report term --cov-report xml:coverage.xml
+    - pytest --cov=. --cov-report term --cov-report xml:coverage.xml | tee /tmp/pytest.txt
+    - sed -n 's/^TOTAL \([-0-9.]*\)\/.*/\1/p' /tmp/pytest.txt > CURRENT_COVERAGE
+    - echo $CURRENT_COVERAGE
+    - if [ "$CURRENT_COVERAGE" -lt "80" ]; then echo "The coverage rate of tests is insufficient" && exit 1; fi;
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
