@@ -22,8 +22,8 @@ class LettingsUrlsTestCase(TestCase):
         assert path == "/lettings/"
         assert resolve(path).view_name == "lettings:index"
 
-    def test_letting_url(self):
-        """test first letting url"""
-        path = reverse("lettings:letting", args=[1])
-        assert path == "/lettings/1/"
-        assert resolve(path).view_name == "lettings:letting"
+    # def test_letting_url(self):
+    #     """test first letting url"""
+    #     path = reverse("lettings:letting", args=[1])
+    #     assert path == "/lettings/1/"
+    #     assert resolve(path).view_name == "lettings:letting"

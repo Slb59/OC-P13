@@ -41,8 +41,7 @@ test-job:
     - merge_requests
   script:
     - echo "Running tests..."
-    - echo $CI_PROJECT_DIR
-    - mkdir -p /builds/slb591/lettings/logs
+    - mkdir -p $CI_PROJECT_DIR/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - pytest
@@ -91,7 +90,7 @@ pylint-job:
     - merge_requests
   script:
     - echo "pylint checking..."
-    - mkdir -p /builds/slb591/lettings/logs
+    - mkdir -p $CI_PROJECT_DIR/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - mkdir -p public/badges public/lint

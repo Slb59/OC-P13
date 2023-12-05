@@ -11,4 +11,5 @@ class ProfilesModelsTestCase(TestCase):
         user = User.objects.create(username="test_user_name")
         profile = Profile.objects.create(user=user, favorite_city="My favorite city")
         expected_value = "test_user_name"
+        assert False
         assert str(profile) == expected_value
