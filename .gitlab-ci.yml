@@ -38,7 +38,6 @@ build-job:       # This job runs in the build stage, which runs first.
 
 test-job:
   stage: test
-  image: slb59/lettings
   only:
     - merge_requests
   script:
