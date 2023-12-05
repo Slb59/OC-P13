@@ -1,8 +1,8 @@
 image: docker:20.10.16
 
 stages:
-  - quality # merge_requests
   - test
+  - quality # merge_requests
   - package # main
   - deploy
   - cleanup
@@ -93,6 +93,7 @@ pylint-job:
     - mkdir -p $CI_PROJECT_DIR/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
+    - pip install pylint-gitlab
     - mkdir -p public/badges public/lint
     - echo undefined > public/badges/$CI_JOB_NAME.score
     - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
