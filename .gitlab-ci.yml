@@ -43,7 +43,7 @@ test-job:
   script:
     - echo "Running tests..."
     - cp $ENV_FILE .env
-    - docker compose run django pytest
+    - docker compose -f compose/docker-compose.yml run django pytest
     - echo "Code coverage is ??%"
 
 flake-job:
