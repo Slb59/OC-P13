@@ -46,7 +46,8 @@ pytest-job:
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - pytest
-    - pytest --cov=. --cov-report=html 
+    - pytest --cov=. --cov-report=html
+    - pytest --html=pytest-report.html
     - coverage run -m pytest
     - coverage json
     - coverage report -m
@@ -55,18 +56,21 @@ pytest-job:
   artifacts:
     paths:
       - coverage.json
-      - htmlcov/index.html
+      - pytest-report.html
+      - htmlcov
 
 min-coverage-test:
   stage: test-coverage
   only:
     - merge_requests
+  image: python:latest  
   before_script:
     - apt-get update && apt-get install jq -y
   script:
     - echo "$MIN_COVERAGE"
     - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
     - coverage="$(echo $jsonStr | jq .totals.percent_covered)"
+    - echo "$coverage"
     - if (( $(echo "$coverage < $MIN_COVERAGE" |bc -l) )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
   
 
