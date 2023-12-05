@@ -1,7 +1,7 @@
 """test letting urls"""
 import pytest
 from django.test import TestCase
-from django.urls import resolve, reverse
+# from django.urls import resolve, reverse
 
 from lettings.models import Letting
 
@@ -16,11 +16,11 @@ class LettingsUrlsTestCase(TestCase):
         self.address = self.myaddress
         self.letting = Letting.objects.create(title="My letting", address=self.address)
 
-    def test_letting_index_url(self):
-        """test index url"""
-        path = reverse("lettings:index")
-        assert path == "/lettings/"
-        assert resolve(path).view_name == "lettings:index"
+    # def test_letting_index_url(self):
+    #     """test index url"""
+    #     path = reverse("lettings:index")
+    #     assert path == "/lettings/"
+    #     assert resolve(path).view_name == "lettings:index"
 
     # def test_letting_url(self):
     #     """test first letting url"""

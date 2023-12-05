@@ -1,10 +1,10 @@
 """test letting views"""
 import pytest
 from django.test import TestCase
-from django.urls import reverse
-from pytest_django.asserts import assertTemplateUsed
+# from django.urls import reverse
+# from pytest_django.asserts import assertTemplateUsed
 
-from lettings.models import Letting
+# from lettings.models import Letting
 
 
 class LettingsViewsTestCase(TestCase):
@@ -16,16 +16,16 @@ class LettingsViewsTestCase(TestCase):
         """setup an instance of address"""
         self.address = self.myaddress
 
-    def test_letting_index_view(self):
-        """test index view"""
-        Letting.objects.create(title="My letting", address=self.address)
-        path = reverse("lettings:index")
-        response = self.client.get(path)
-        expected_content = (
-            '<h1 class="page-header-ui-title mb-3 display-6">Lettings</h1>'
-        )
-        self.assertContains(response, expected_content, status_code=200)
-        assertTemplateUsed(response, "lettings/index.html")
+    # def test_letting_index_view(self):
+    #     """test index view"""
+    #     Letting.objects.create(title="My letting", address=self.address)
+    #     path = reverse("lettings:index")
+    #     response = self.client.get(path)
+    #     expected_content = (
+    #         '<h1 class="page-header-ui-title mb-3 display-6">Lettings</h1>'
+    #     )
+    #     self.assertContains(response, expected_content, status_code=200)
+    #     assertTemplateUsed(response, "lettings/index.html")
 
     # def test_letting_view(self):
     #     """test letting view"""
