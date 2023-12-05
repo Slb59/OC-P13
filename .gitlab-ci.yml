@@ -41,12 +41,12 @@ test-job:
     - merge_requests
   script:
     - echo "Running tests..."
-    - echo $CI_CONFIG_PATH
+    - echo $CI_PROJECT_DIR
     - mkdir -p /builds/slb591/lettings/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - pytest
-    - pytest --cov=. --cov-report=html
+    - pytest --cov=. --cov-report term --cov-report xml:coverage.xml
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
@@ -91,7 +91,7 @@ pylint-job:
     - merge_requests
   script:
     - echo "pylint checking..."
-    - mkdir -p /app/logs
+    - mkdir -p /builds/slb591/lettings/logs
     - cp $ENV_FILE .env
     - pip install -r requirements.txt
     - mkdir -p public/badges public/lint
