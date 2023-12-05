@@ -70,7 +70,7 @@ isort-job:
   script:
     - echo "isort import code..."
     - isort . --check
-    - echo "see isort report"
+    - echo "no isort issues found"
 
 black-job:
   stage: quality
@@ -80,7 +80,7 @@ black-job:
   script:
     - echo "black checking..."
     - black . --check
-    - echo "see black report"
+    - echo "no black issues found"
 
 pylint-job:
   stage: linting
