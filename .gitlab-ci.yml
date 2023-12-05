@@ -2,7 +2,7 @@ image: docker:20.10.16
 
 stages:
   - test
-  - coverage
+  - test-coverage
   - quality # merge_requests
   - package # main
   - deploy
@@ -60,9 +60,9 @@ pytest-job:
     paths:
       - coverage.json
       - htmlcov/index.html
-      
+
 min-coverage-test:
-  stage: coverage
+  stage: test-coverage
   before_script:
     - apt-get update && apt-get install jq -y
     - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
