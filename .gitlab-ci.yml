@@ -36,7 +36,6 @@ build-job:       # This job runs in the build stage, which runs first.
     paths:
       - public/build/build.html
 
-
 pytest-job:
   stage: test
   image: python:latest
@@ -75,8 +74,6 @@ min-coverage-test:
     - echo "$coverage < $MIN_COVERAGE"
     - if  (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
  
-
-
 flake-job:
   stage: quality
   image: python:latest 
@@ -95,22 +92,20 @@ isort-job:
   only:
     - merge_requests
   image: python:latest  
-  before_script:
-    - apt-get update && apt-get install --no-install-recommends -y build-essential
   script:
     - echo "isort import code..."
     - pip install isort
     - isort . --check
     - echo "no isort issues found"
 
-
 black-job:
   stage: quality
-  image: docker.io/slb59/django-linting
+  image: python:latest 
   only:
     - merge_requests
   script:
     - echo "black checking..."
+    - pip install black    
     - black . --check
     - echo "no black issues found"
 
@@ -143,7 +138,6 @@ pylint-job:
     reports:
       codequality: codeclimate.json
     when: always
-
 
 package-job:
   stage: package
