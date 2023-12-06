@@ -1,9 +1,9 @@
 image: docker:20.10.16
 
 stages:
+  - quality # merge_requests
   - test
   - test-coverage
-  - quality # merge_requests
   - package # main
   - deploy
   - cleanup
@@ -86,11 +86,15 @@ flake-job:
 
 isort-job:
   stage: quality
-  image: docker.io/slb59/django-linting
   only:
     - merge_requests
+  image: python:latest  
+  before_script:
+    - apt-get update && apt-get install --no-install-recommends -y \
+    build-essential
   script:
     - echo "isort import code..."
+    - pip install isort
     - isort . --check
     - echo "no isort issues found"
 
@@ -134,15 +138,6 @@ pylint-job:
       codequality: codeclimate.json
     when: always
 
-package-job:
-  stage: package
-  only:
-    - main
-  script:
-    - echo "package job working..."
-    - sleep 10
-    - echo "package job completed"
-
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
@@ -158,5 +153,5 @@ cleanup-job:
     - main
   script:
     - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
-    - sleep 10
+    - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
     - echo "cleanup completed"
