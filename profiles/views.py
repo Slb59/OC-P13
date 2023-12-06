@@ -54,6 +54,6 @@ def profile(request, username):
     Returns:
         _type_: _description_
     """
-    profile = get_object_or_404(Profile, user__username=username)
-    context = {"profile": profile}
+    a_profile = get_object_or_404(Profile, user__username=username)
+    context = {"profile": a_profile}
     return render(request, "profiles/profile.html", context)
