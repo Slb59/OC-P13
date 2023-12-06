@@ -58,13 +58,18 @@ flake-job:
 
 isort-job:
   stage: quality
-  image: docker.io/slb59/django-linting
   only:
     - merge_requests
+  image: python:latest  
+  before_script:
+    - apt-get update && apt-get install --no-install-recommends -y \
+    build-essential
   script:
     - echo "isort import code..."
+    - pip install isort
     - isort . --check
     - echo "no isort issues found"
+
 
 black-job:
   stage: quality
@@ -126,5 +131,6 @@ cleanup-job:
     - main
   script:
     - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
-    - sleep 10
+    - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
     - echo "cleanup completed"
+
