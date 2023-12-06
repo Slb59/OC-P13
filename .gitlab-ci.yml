@@ -136,7 +136,7 @@ deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
   only:
-    - master
+    - main
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
@@ -145,8 +145,12 @@ cleanup-job:
   stage: cleanup
   only:
     - main
+  image: python:latest  
   script:
     - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
+    - pip install python-gitlab
+    - pip install pytz
+    - pip install python-dateutil
     - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
     - echo "cleanup completed"
 
