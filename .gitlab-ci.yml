@@ -2,9 +2,8 @@ image: docker:20.10.16
 
 stages:
   - quality # merge_requests
-  - build
   - test
-  - linting
+  - test-coverage
   - package # main
   - deploy
   - cleanup
@@ -20,9 +19,9 @@ services:
     command: ["--tls=false"]
 
 build-job:       # This job runs in the build stage, which runs first.
-  stage: build
+  stage: package
   only:
-    - merge_requests
+    - main
   script:
     - echo "Compiling the code..."
     - cp $ENV_FILE .env
@@ -36,15 +35,44 @@ build-job:       # This job runs in the build stage, which runs first.
     paths:
       - public/build/build.html
 
-test-job:
+pytest-job:
   stage: test
+  image: python:latest
   only:
     - merge_requests
   script:
     - echo "Running tests..."
+    - mkdir -p $CI_PROJECT_DIR/logs
     - cp $ENV_FILE .env
-    - docker compose -f compose/docker-compose.yml run django pytest
-    - echo "Code coverage is ??%"
+    - pip install -r requirements.txt
+    - pytest
+    - pytest --cov=. --cov-report=html
+    - pytest --html=htmlreport/pytest-report.html
+    - coverage run -m pytest
+    - coverage json
+    - coverage report -m
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+  artifacts:
+    paths:
+      - coverage.json
+      - htmlreport
+      - htmlcov
+
+min-coverage-test:
+  stage: test-coverage
+  only:
+    - merge_requests
+  image: python:latest  
+  before_script:
+    - apt-get update && apt-get install jq -y && apt install bc
+  script:
+    - echo "$MIN_COVERAGE"
+    - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
+    - coverage="$(echo $jsonStr | jq .totals.percent_covered)"
+    - echo "$coverage"
+    - echo "$coverage < $MIN_COVERAGE"
+    - if  (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
+  
 
 flake-job:
   stage: quality
@@ -58,11 +86,15 @@ flake-job:
 
 isort-job:
   stage: quality
-  image: docker.io/slb59/django-linting
   only:
     - merge_requests
+  image: python:latest  
+  before_script:
+    - apt-get update && apt-get install --no-install-recommends -y \
+    build-essential
   script:
     - echo "isort import code..."
+    - pip install isort
     - isort . --check
     - echo "no isort issues found"
 
@@ -77,12 +109,16 @@ black-job:
     - echo "no black issues found"
 
 pylint-job:
-  stage: linting
-  image: slb59/lettings
+  stage: test
+  image: python:latest
   only:
     - merge_requests
   script:
     - echo "pylint checking..."
+    - mkdir -p $CI_PROJECT_DIR/logs
+    - cp $ENV_FILE .env
+    - pip install -r requirements.txt
+    - pip install pylint-gitlab
     - mkdir -p public/badges public/lint
     - echo undefined > public/badges/$CI_JOB_NAME.score
     - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
@@ -102,15 +138,6 @@ pylint-job:
       codequality: codeclimate.json
     when: always
 
-package-job:
-  stage: package
-  only:
-    - main
-  script:
-    - echo "package job working..."
-    - sleep 10
-    - echo "package job completed"
-
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
@@ -126,5 +153,5 @@ cleanup-job:
     - main
   script:
     - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
-    - sleep 10
+    - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
     - echo "cleanup completed"
