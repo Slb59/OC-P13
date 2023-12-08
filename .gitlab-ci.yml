@@ -160,11 +160,7 @@ deploy-job:      # This job runs in the deploy stage.
     - echo $CI_PIPELINE_IID
     - docker compose -f compose/docker-compose.yml build
     - docker tag slb59/$APP_NAME:latest $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
-    - docker tag redis $DOCKER_REGISTRY/redis:$CI_PIPELINE_IID
-    - docker tag memcached $DOCKER_REGISTRY/memcached:$CI_PIPELINE_IID
     - docker push $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
-    - docker push $DOCKER_REGISTRY/redis:$CI_PIPELINE_IID
-    - docker push $DOCKER_REGISTRY/memcached:$CI_PIPELINE_IID
     - echo "Application successfully deployed."
 
 cleanup-job:
