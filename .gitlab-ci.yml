@@ -152,7 +152,7 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - cp $ENV_FILE .env
-    - docker info
+    - apk add --no-cache curl jq python3 py3-pip
     - pip install awscli
     - aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin $DOCKER_REGISTRY
     - aws --version
