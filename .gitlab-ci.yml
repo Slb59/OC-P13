@@ -132,11 +132,22 @@ pylint-job:
       codequality: codeclimate.json
     when: always
 
+
+render-job:
+  image: cimg/base:stable
+  environment: production
+  stage: deploy
+  only:
+    - main
+  script:
+    - curl -X GET https://api.render.com/deploy/srv-clq6eu9jvg7s73e3lffg?key=jqZZ8J2Vf24
+
+
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
   only:
-    - main
+    - never
   image: docker:latest  
   variables:
     DOCKER_REGISTRY: 917026210807.dkr.ecr.eu-west-3.amazonaws.com
