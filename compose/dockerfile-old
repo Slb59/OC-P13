@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 COPY . .
 
-RUN mkdir -p /app/logs
+COPY ./compose/start /start
+RUN sed -i 's/\r$//g' /start && chmod +x /start
 
-RUN python manage.py migrate
-RUN python manage.py runserver 0.0.0.0:8000
+RUN mkdir -p /app/logs

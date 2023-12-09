@@ -4,7 +4,7 @@ services:
   django:
     build:
       context: ..
-      dockerfile: ./compose/dockerfile
+      dockerfile: ./compose/dockerfile-old
     image: slb59/lettings
     container_name: lettings
     depends_on:
