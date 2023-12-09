@@ -2,12 +2,12 @@ stages:
   - quality # merge_requests
   - test
   - test-coverage
-  - package # main
-  - deploy
+  # - package 
+  - deploy # main
   - cleanup
 
 build-job:       # This job runs in the build stage, which runs first.
-  stage: package
+  stage: deploy
   only:
     - main
   image: docker:latest
@@ -26,11 +26,12 @@ build-job:       # This job runs in the build stage, which runs first.
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
     - mkdir -p public/build
     - docker compose -f compose/docker-compose.yml build
-    - docker images slb59/lettings > public/build/build.html
+    - docker compose -f compose/docker-compose.yml push
+    # - docker images slb59/lettings > public/build/build.html
     - echo "Compile complete."
-  artifacts:
-    paths:
-      - public/build/build.html
+  # artifacts:
+  #   paths:
+  #     - public/build/build.html
 
 pytest-job:
   stage: test
