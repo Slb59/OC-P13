@@ -22,6 +22,7 @@ if DEBUG:
     ALLOWED_HOSTS = ["*"]
 else:
     ALLOWED_HOSTS = env.list("HOSTS", default=[])
+    CSRF_TRUSTED_ORIGINS = ["https://service-lettings-3.onrender.com"]
 
 # Application definition
 
