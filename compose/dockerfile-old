@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /app
 
-COPY ./requirements.txt .
+COPY ./compose/requirements.txt .
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential && pip install -r requirements.txt
