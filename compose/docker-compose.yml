@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: ./compose/dockerfile-old
-    image: slb59/lettings
+    image: lettings
     container_name: lettings
     depends_on:
       - memcached
