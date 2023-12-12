@@ -9,3 +9,4 @@ utils
 dockerfile
 docker-compose.yml
 staticfiles
+tests
