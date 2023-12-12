@@ -25,6 +25,7 @@ build-job:
     # - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
     # - mkdir -p public/build
+    - docker system prune -f
     - docker compose -f compose/docker-compose.yml build
     - docker compose -f compose/docker-compose.yml push
     # - docker images slb59/lettings > public/build/build.html
