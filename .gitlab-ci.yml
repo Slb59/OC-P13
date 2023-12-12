@@ -4,10 +4,11 @@ stages:
   - test-coverage
   # - package 
   - deploy # main
+  - build
   - cleanup
 
 build-job:
-  stage: deploy
+  stage: build
   only:
     - main
   image: docker:20.10.16
