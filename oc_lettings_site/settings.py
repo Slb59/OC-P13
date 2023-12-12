@@ -136,6 +136,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+# Static file serving.
+STORAGES = {
+    # ...
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
@@ -233,6 +240,3 @@ INTERNAL_IPS = [
 
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
-
-# Static file serving.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
