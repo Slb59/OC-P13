@@ -4,6 +4,10 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PORT=8000
 
+# ENV VIRTUAL_ENV=/opt/venv
+# RUN python3 -m venv $VIRTUAL_ENV
+# ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
 WORKDIR /app
 
 COPY ./compose/requirements.txt .
@@ -17,10 +21,6 @@ RUN mkdir -p /app/logs
 
 EXPOSE $PORT
 
-# RUN python manage.py migrate
-# RUN python manage.py collectstatic --noinput
-# COPY ./compose/start.sh start.sh
 RUN sed -i 's/\r$//g' ./compose/start.sh && chmod +x ./compose/start.sh
 
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 CMD ["./compose/start.sh"]

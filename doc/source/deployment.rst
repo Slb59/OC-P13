@@ -24,14 +24,14 @@ pipeline
 - on commit,
 	- the files are updated in gitlab and github
 	- a first check is running for quality
-	- then a lite build is created for test and linting
 	- then test and linting are executed
+	- then the pipeline check if tests are 80% coverage
 
 - on merge request into main branch,
 	- the latest version of documentation is updating
 	- then complete build is generated
-	- the deployement is running on docker hub and aws
+	- the deployement is running on docker hub and render
 
 - on merge request into a stable branch,
 	- the stable version of documentation is updating
-	- the deployement is running on docker hub and aws
+	- the deployement is running on docker hub and render
