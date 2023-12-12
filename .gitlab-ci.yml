@@ -23,7 +23,10 @@ build-job:
     - echo "Compiling the code..."
     - cp $ENV_FILE .env
     # - docker info
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - echo $CI_REGISTRY_USER
+    - echo $CI_JOB_TOKEN
+    - echo $CI_REGISTRY
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     # - mkdir -p public/build
     - docker system prune -f
     - docker compose -f compose/docker-compose.yml build
