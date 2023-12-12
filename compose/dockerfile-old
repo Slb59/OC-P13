@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 COPY . .
 
-COPY ./compose/start /start
+COPY ./compose/start.sh /start.sh
 RUN sed -i 's/\r$//g' /start && chmod +x /start
 
 RUN mkdir -p /app/logs
