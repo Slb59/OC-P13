@@ -10,7 +10,7 @@ build-job:
   stage: deploy
   only:
     - main
-  image: docker:git
+  image: docker:20.10.16
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
