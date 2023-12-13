@@ -2,7 +2,6 @@ stages:
   - quality # merge_requests
   - test
   - test-coverage
-  # - package 
   - deploy # main
   - cleanup
 
@@ -22,21 +21,14 @@ build-job:
   script:
     - echo "Compiling the code..."
     - cp $ENV_FILE .env
-    # - docker info
     - echo $CI_REGISTRY_USER
     - echo $CI_JOB_TOKEN
     - echo $CI_REGISTRY
     - docker login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    # - mkdir -p public/build
     - docker system prune -f
     - docker compose -f compose/docker-compose.yml build
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - docker compose -f compose/docker-compose.yml push
-    # - docker images slb59/lettings > public/build/build.html
     - echo "Compile complete."
-  # artifacts:
-  #   paths:
-  #     - public/build/build.html
 
 pytest-job:
   stage: test
@@ -149,8 +141,8 @@ render-job:
     - curl -X GET https://api.render.com/deploy/srv-clq6eu9jvg7s73e3lffg?key=jqZZ8J2Vf24
 
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+deploy-job:      # AWS DEPLOY
+  stage: deploy  
   environment: production
   only:
     - never
@@ -192,4 +184,3 @@ cleanup-job:
     - pip install python-dateutil
     - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
     - echo "cleanup completed"
-
