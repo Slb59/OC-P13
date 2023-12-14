@@ -26,7 +26,8 @@ The different tools used for the development and deployment of this application 
    - Docker and docker desktop for code containerization
    - Gitlab for continuous code integration and delivery
    - Read the docs, to publish the documentation
-   - AWS for deployment of the application
+   - AWS as runner for CI-CD process
+   - Render for déployement on a public url
 
 .. toctree::
    :maxdepth: 2

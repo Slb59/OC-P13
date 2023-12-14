@@ -1,6 +1,5 @@
 """test letting models"""
 import pytest
-
 from django.test import TestCase
 
 from lettings.models import Letting

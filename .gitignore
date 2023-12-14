@@ -7,3 +7,4 @@ utils
 logs
 .coverage
 doc/build
+staticfiles
