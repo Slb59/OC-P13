@@ -9,7 +9,7 @@ build-job:
   stage: deploy
   only:
     - main
-    - 1.0.0
+    - "1.0.0"
   image: docker:20.10.16
   variables:
     DOCKER_HOST: tcp://docker:2375
@@ -137,7 +137,7 @@ render-job:
   stage: deploy
   only:
     - main
-    - 1.0.0
+    - "1.0.0"
   script:
     - curl -X GET https://api.render.com/deploy/srv-clq6eu9jvg7s73e3lffg?key=jqZZ8J2Vf24
 
