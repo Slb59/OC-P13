@@ -1,31 +1,186 @@
-stages:          # List of stages for jobs, and their order of execution
-  - build
+stages:
+  - quality # merge_requests
   - test
-  - deploy
+  - test-coverage
+  - deploy # main
+  - cleanup
 
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
+build-job:
+  stage: deploy
+  only:
+    - main
+  image: docker:20.10.16
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
+  services:
+    - name: docker:20.10.16-dind
+      alias: docker
+      command: ["--tls=false"]    
   script:
     - echo "Compiling the code..."
+    - cp $ENV_FILE .env
+    - echo $CI_REGISTRY_USER
+    - echo $CI_JOB_TOKEN
+    - echo $CI_REGISTRY
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker system prune -f
+    - docker compose -f compose/docker-compose.yml build
+    - docker compose -f compose/docker-compose.yml push
     - echo "Compile complete."
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+pytest-job:
+  stage: test
+  image: python:latest
+  only:
+    - merge_requests
   script:
-    - echo "Running unit tests... This will take about 60 seconds."
-    - sleep 60
-    - echo "Code coverage is 90%"
+    - echo "Running tests..."
+    - mkdir -p $CI_PROJECT_DIR/logs
+    - cp $ENV_FILE .env
+    - pip install -r requirements.txt
+    - pytest
+    - pytest --cov=. --cov-report=html
+    - pytest --html=htmlreport/pytest-report.html
+    - coverage run -m pytest
+    - coverage json
+    - coverage report -m
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+  artifacts:
+    paths:
+      - coverage.json
+      - htmlreport
+      - htmlcov
 
-lint-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+min-coverage-test:
+  stage: test-coverage
+  only:
+    - merge_requests
+  image: python:latest  
+  before_script:
+    - apt-get update && apt-get install jq -y && apt install bc
   script:
-    - echo "Linting code... This will take about 10 seconds."
-    - sleep 10
+    - jsonStr="$(cat $CI_PROJECT_DIR/coverage.json)"
+    - coverage="$(echo $jsonStr | jq .totals.percent_covered)"
+    - if  (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )) ; then echo "$coverage% of code coverage below threshold of $MIN_COVERAGE%" && exit 1 ; else exit 0 ; fi  
+ 
+flake-job:
+  stage: quality
+  image: python:latest 
+  only:
+    - merge_requests
+  # before_script:
+  #   - apt-get update && apt-get install --no-install-recommends -y build-essential
+  script:
+    - echo "Linting code..."
+    - pip install flake8
+    - flake8
     - echo "No lint issues found."
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+isort-job:
+  stage: quality
+  only:
+    - merge_requests
+  image: python:latest  
+  script:
+    - echo "isort import code..."
+    - pip install isort
+    - isort . --check
+    - echo "no isort issues found"
+
+black-job:
+  stage: quality
+  image: python:latest 
+  only:
+    - merge_requests
+  script:
+    - echo "black checking..."
+    - pip install black    
+    - black . --check
+    - echo "no black issues found"
+
+pylint-job:
+  stage: test
+  image: python:latest
+  only:
+    - merge_requests
+  script:
+    - echo "pylint checking..."
+    - mkdir -p $CI_PROJECT_DIR/logs
+    - cp $ENV_FILE .env
+    - pip install -r requirements.txt
+    - pip install pylint-gitlab
+    - mkdir -p public/badges public/lint
+    - echo undefined > public/badges/$CI_JOB_NAME.score
+    - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
+    - sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' /tmp/pylint.txt > public/badges/$CI_JOB_NAME.score
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabCodeClimateReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > codeclimate.json
+    - pylint --exit-zero --load-plugins=pylint_gitlab --output-format=gitlab-codeclimate $(find -type f -name "*.py" ! -path "**/.venv/**") > codeclimate.json
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabPagesHtmlReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > public/lint/index.html
+    - echo "pylint process completed, check the report"
+  after_script:
+    - anybadge --overwrite --label $CI_JOB_NAME --value=$(cat public/badges/$CI_JOB_NAME.score) --file=public/badges/$CI_JOB_NAME.svg 4=red 6=orange 8=yellow 10=green
+    - |
+      echo "Your score is: $(cat public/badges/$CI_JOB_NAME.score)"
+  artifacts:
+    paths:
+      - public
+    reports:
+      codequality: codeclimate.json
+    when: always
+
+
+render-job:
+  image: cimg/base:stable
   environment: production
+  stage: deploy
+  only:
+    - main
+  script:
+    - curl -X GET https://api.render.com/deploy/srv-clq6eu9jvg7s73e3lffg?key=jqZZ8J2Vf24
+
+
+deploy-job:      # AWS DEPLOY
+  stage: deploy  
+  environment: production
+  only:
+    - never
+  image: docker:latest  
+  variables:
+    DOCKER_REGISTRY: 917026210807.dkr.ecr.eu-west-3.amazonaws.com
+    AWS_DEFAULT_REGION: eu-west-3
+    APP_NAME: lettings
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - name: docker:20.10.16-dind
+      alias: docker
+      command: ["--tls=false"]
   script:
     - echo "Deploying application..."
+    - cp $ENV_FILE .env
+    - apk add --no-cache curl jq python3 py3-pip
+    - pip install awscli
+    - aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+    - aws --version
+    - docker --version
+    - echo $CI_PIPELINE_IID
+    - docker compose -f compose/docker-compose.yml build
+    - docker tag slb59/$APP_NAME:latest $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
+    - docker push $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
     - echo "Application successfully deployed."
+
+cleanup-job:
+  stage: cleanup
+  only:
+    - main
+  image: python:latest  
+  script:
+    - echo "Clean old pipeline depending on $PIPELINE_KEEP_DAYS variable"
+    - pip install python-gitlab
+    - pip install pytz
+    - pip install python-dateutil
+    - python compose/delete_pipelines.py $CI_SERVER_URL $GITLAB_TOKEN $PIPELINE_KEEP_DAYS $CI_PROJECT_ID
+    - echo "cleanup completed"
