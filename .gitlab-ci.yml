@@ -131,7 +131,6 @@ pylint-job:
       codequality: codeclimate.json
     when: always
 
-
 render-job:
   image: cimg/base:stable
   environment: production
