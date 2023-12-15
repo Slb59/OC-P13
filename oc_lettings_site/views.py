@@ -1,6 +1,5 @@
 import logging
 
-from django.http import HttpResponseServerError
 from django.shortcuts import render
 
 logger = logging.getLogger(__name__)
@@ -38,5 +37,5 @@ def trigger_error(request):
     try:
         division_by_zero = 1 / 0
         return division_by_zero
-    except Exception:
-        return HttpResponseServerError()
+    except ZeroDivisionError:
+        raise ZeroDivisionError

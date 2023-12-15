@@ -16,7 +16,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG_VALUE") == "True"
-print(DEBUG)
+TEMPLATE_DEBUG = DEBUG
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
@@ -219,7 +219,7 @@ LOGGING = {
     },
 }
 
-DEBUG_PROPAGATE_EXCEPTIONS = True
+# DEBUG_PROPAGATE_EXCEPTIONS = True
 
 # SESSIONS_ENGINE = 'django.contrib.sessions.backends.cache'
 if env("USE_CACHE") == "True":
