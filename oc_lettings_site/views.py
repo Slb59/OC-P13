@@ -1,6 +1,5 @@
 import logging
 
-from django.http import HttpResponseServerError
 from django.shortcuts import render
 
 logger = logging.getLogger(__name__)
